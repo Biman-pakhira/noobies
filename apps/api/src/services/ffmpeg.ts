@@ -44,10 +44,10 @@ export async function getVideoMetadata(filePath: string): Promise<{
   bitrate: number;
 }> {
   return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(filePath, (err, metadata) => {
+    ffmpeg.ffprobe(filePath, (err: any, metadata: any) => {
       if (err) return reject(err);
 
-      const stream = metadata.streams.find((s) => s.codec_type === 'video');
+      const stream = metadata.streams.find((s: any) => s.codec_type === 'video');
       if (!stream) return reject(new Error('No video stream found'));
 
       resolve({
@@ -96,7 +96,6 @@ async function transcodeResolution(
     }
 
     const playlistPath = path.join(outputDir, `${resolution}.m3u8`);
-    const segmentPattern = path.join(outputDir, `${resolution}-segment-%d.ts`);
 
     ffmpeg(inputPath)
       .outputOptions([

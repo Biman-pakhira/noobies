@@ -3,7 +3,7 @@ import { db } from '@video-platform/db';
 import { hashPassword, verifyPassword } from '../utils/password';
 import { JWT_CONFIG } from '../utils/jwt';
 import { registerSchema, loginSchema, refreshSchema, RegisterInput, LoginInput, RefreshInput } from '../schemas/auth';
-import type { User, AuthTokens } from '@video-platform/types';
+// unused
 
 /**
  * Register a new user
@@ -60,7 +60,7 @@ async function register(request: FastifyRequest, reply: FastifyReply) {
         email: user.email,
         role: user.role,
       },
-      { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY, secret: process.env.JWT_REFRESH_SECRET }
+      { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY }
     );
 
     // Store refresh token in DB
@@ -155,7 +155,7 @@ async function login(request: FastifyRequest, reply: FastifyReply) {
         email: user.email,
         role: user.role,
       },
-      { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY, secret: process.env.JWT_REFRESH_SECRET }
+      { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRY }
     );
 
     // Store refresh token in DB
@@ -208,9 +208,7 @@ async function refresh(request: FastifyRequest, reply: FastifyReply) {
 
     // Verify refresh token
     try {
-      const decoded = request.server.jwt.verify(data.refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET,
-      }) as any;
+      const decoded = request.server.jwt.verify(data.refreshToken) as any;
 
       // Check if token exists in DB
       const tokenRecord = await db.refreshToken.findUnique({

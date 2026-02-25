@@ -35,13 +35,10 @@ export interface TranscodingProgress {
 export class TranscodingQueue {
   private queue: Queue<TranscodingJobData>;
   private worker: Worker<TranscodingJobData> | null = null;
-  private queueEvents: QueueEvents;
   private redis: Redis;
 
   constructor() {
-    this.redis = new Redis({
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
-    });
+    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
     this.queue = new Queue<TranscodingJobData>('video-transcoding', {
       connection: this.redis,
@@ -55,10 +52,6 @@ export class TranscodingQueue {
         removeOnFail: false,
       },
     });
-
-    this.queueEvents = new QueueEvents('video-transcoding', {
-      connection: this.redis,
-    });
   }
 
   /**
@@ -69,7 +62,7 @@ export class TranscodingQueue {
       jobId: data.videoId,
     });
 
-    console.log(`📌 Added transcoding job for video ${data.videoId}`);
+    if (!job.id) throw new Error('Job ID was not generated');
     return job.id;
   }
 
@@ -231,7 +224,7 @@ export class TranscodingQueue {
     return {
       id: job.id,
       status: await job.getState(),
-      progress: job.progress(),
+      progress: job.progress as number,
       data: job.data,
     };
   }

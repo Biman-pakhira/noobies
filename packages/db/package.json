@@ -17,7 +17,7 @@
     "seed": "ts-node --esm prisma/seed.ts"
   },
   "devDependencies": {
-    "@prisma/cli": "^5.7.0",
+    "prisma": "^5.7.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },

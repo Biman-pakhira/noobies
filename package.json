@@ -17,6 +17,7 @@
     "db:push": "turbo run db:push --filter=@video-platform/db"
   },
   "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.28",
     "turbo": "^1.10.12",
     "typescript": "^5.3.3"
   }
