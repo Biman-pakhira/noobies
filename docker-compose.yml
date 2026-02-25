@@ -1,0 +1,120 @@
+version: '3.9'
+
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: video-platform-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: video_platform
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: video-platform-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Elasticsearch for Search
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.0
+    container_name: video-platform-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ClickHouse for Analytics
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: video-platform-clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      - CLICKHOUSE_DB=video_events
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO for S3 compatible storage (local alternative)
+  minio:
+    image: minio/minio:latest
+    container_name: video-platform-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/minio_root
+    command: minio server /minio_root --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Recommendation Service (Python FastAPI)
+  recommender:
+    build:
+      context: ./apps/recommender
+      dockerfile: Dockerfile
+    container_name: video-platform-recommender
+    environment:
+      DATABASE_URL: mongodb://admin:password@mongodb:27017/video_platform
+      RECOMMENDER_PORT: 3002
+      RECOMMENDER_HOST: 0.0.0.0
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongodb
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:3002/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+  redis_data:
+  elasticsearch_data:
+  clickhouse_data:
+  minio_data:
+
+networks:
+  default:
+    name: video-platform

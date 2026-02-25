@@ -1,0 +1,23 @@
+{
+  "name": "video-streaming-platform",
+  "version": "1.0.0",
+  "description": "Full-stack video streaming and discovery platform with AI recommendations",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "db:migrate": "turbo run db:migrate --filter=@video-platform/db",
+    "db:push": "turbo run db:push --filter=@video-platform/db"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.12",
+    "typescript": "^5.3.3"
+  }
+}

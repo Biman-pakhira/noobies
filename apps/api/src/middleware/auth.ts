@@ -1,0 +1,76 @@
+import { FastifyRequest, FastifyReply } from 'fastify';
+import { JWTPayload } from '@video-platform/types';
+
+/**
+ * Extend FastifyRequest to include user from JWT
+ */
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      JWT_SECRET: string;
+      JWT_REFRESH_SECRET: string;
+    }
+  }
+}
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    user?: JWTPayload;
+  }
+}
+
+/**
+ * Authentication middleware to verify JWT
+ */
+export async function authMiddleware(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    await request.jwtVerify();
+  } catch (error) {
+    reply.status(401).send({
+      success: false,
+      error: {
+        message: 'Unauthorized: Invalid or missing token',
+        code: 'UNAUTHORIZED',
+      },
+    });
+  }
+}
+
+/**
+ * Optional authentication middleware (doesn't fail if no token)
+ */
+export async function optionalAuthMiddleware(request: FastifyRequest, _reply: FastifyReply) {
+  try {
+    await request.jwtVerify();
+  } catch {
+    // User is not authenticated, continue anyway
+  }
+}
+
+/**
+ * Verify user role
+ */
+export function requireRole(...roles: string[]) {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      await request.jwtVerify();
+      if (!request.user || !roles.includes(request.user.role)) {
+        return reply.status(403).send({
+          success: false,
+          error: {
+            message: 'Forbidden: Insufficient permissions',
+            code: 'FORBIDDEN',
+          },
+        });
+      }
+    } catch {
+      return reply.status(401).send({
+        success: false,
+        error: {
+          message: 'Unauthorized: Invalid or missing token',
+          code: 'UNAUTHORIZED',
+        },
+      });
+    }
+  };
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@video-platform/db",
+  "version": "1.0.0",
+  "description": "Prisma database schema and migrations",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "private": true,
+  "scripts": {
+    "db:push": "prisma db push --skip-generate",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:seed": "ts-node --esm prisma/seed.ts",
+    "build": "echo 'DB package built'",
+    "dev": "echo 'DB package in dev'"
+  },
+  "prisma": {
+    "seed": "ts-node --esm prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@prisma/cli": "^5.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0"
+  }
+}

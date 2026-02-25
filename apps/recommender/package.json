@@ -1,0 +1,11 @@
+{
+  "name": "@video-platform/recommender",
+  "version": "1.0.0",
+  "description": "Python FastAPI recommendation microservice",
+  "private": true,
+  "scripts": {
+    "dev": "poetry run uvicorn app.main:app --reload --port 8000",
+    "build": "poetry build",
+    "test": "poetry run pytest"
+  }
+}
