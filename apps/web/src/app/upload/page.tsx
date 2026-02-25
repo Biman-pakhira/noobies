@@ -189,11 +189,10 @@ export default function UploadPage() {
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-lg p-12 text-center transition ${
-                isDragging
+              className={`border-2 border-dashed rounded-lg p-12 text-center transition ${isDragging
                   ? 'border-red-500 bg-red-500/10'
                   : 'border-gray-700 hover:border-gray-600'
-              }`}
+                }`}
             >
               {file ? (
                 <div>
@@ -282,10 +281,10 @@ export default function UploadPage() {
           {/* Submit */}
           <button
             type="submit"
-            disabled={uploadMutation.isLoading || !file || !title.trim()}
+            disabled={uploadMutation.isPending || !file || !title.trim()}
             className="w-full px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition"
           >
-            {uploadMutation.isLoading ? 'Uploading...' : 'Upload Video'}
+            {uploadMutation.isPending ? 'Uploading...' : 'Upload Video'}
           </button>
 
           <p className="text-xs text-gray-500 text-center mt-4">

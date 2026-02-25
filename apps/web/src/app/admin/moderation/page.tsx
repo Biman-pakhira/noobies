@@ -41,7 +41,7 @@ export default function ModerationPage() {
   if (error) {
     return (
       <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 text-red-200">
-        Failed to load moderation queue: {error}
+        Failed to load moderation queue: {(error as Error).message}
       </div>
     );
   }

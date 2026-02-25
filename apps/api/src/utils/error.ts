@@ -30,7 +30,7 @@ export function createErrorHandler() {
         error: {
           message: error.message,
           code: error.code,
-          ...(error.details && { details: error.details }),
+          ...(error.details ? { details: error.details } : {}),
         },
         timestamp: Date.now(),
       } as ApiErrorResponse);

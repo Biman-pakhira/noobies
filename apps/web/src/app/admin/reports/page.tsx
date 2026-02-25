@@ -37,7 +37,7 @@ export default function ReportsPage() {
   if (error) {
     return (
       <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 text-red-200">
-        Failed to load reports: {error}
+        Failed to load reports: {(error as Error).message}
       </div>
     );
   }
@@ -59,11 +59,10 @@ export default function ReportsPage() {
               setStatus(s);
               setPage(1);
             }}
-            className={`px-4 py-2 rounded transition-colors ${
-              status === s
+            className={`px-4 py-2 rounded transition-colors ${status === s
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
+              }`}
           >
             {s === 'all' ? 'All' : s}
           </button>
@@ -110,13 +109,12 @@ export default function ReportsPage() {
                     </td>
                     <td className="px-6 py-3">
                       <span
-                        className={`text-xs px-2 py-1 rounded ${
-                          report.status === 'OPEN'
+                        className={`text-xs px-2 py-1 rounded ${report.status === 'OPEN'
                             ? 'bg-red-900/20 text-red-400'
                             : report.status === 'RESOLVED'
-                            ? 'bg-green-900/20 text-green-400'
-                            : 'bg-gray-700/20 text-gray-400'
-                        }`}
+                              ? 'bg-green-900/20 text-green-400'
+                              : 'bg-gray-700/20 text-gray-400'
+                          }`}
                       >
                         {report.status}
                       </span>

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { LogOut, Bell } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/lib/auth';
 
 interface AdminHeaderProps {
   user: any;
@@ -10,7 +10,7 @@ interface AdminHeaderProps {
 
 export default function AdminHeader({ user }: AdminHeaderProps) {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout } = useAuthStore();
 
   const handleLogout = async () => {
     await logout();

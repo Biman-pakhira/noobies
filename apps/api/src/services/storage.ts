@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import { promises as fs } from 'fs';
-import path from 'path';
+// unused
 
 /**
  * Abstract storage provider interface

@@ -46,7 +46,7 @@ export interface TrendingVideo {
 
 export function useVideos(page = 1, limit = 12) {
   return useGetQuery<{ videos: Video[]; total: number; pages: number }>(
-    ['videos', page],
+    ['videos', `${page}`],
     `/api/videos?page=${page}&limit=${limit}`
   );
 }
@@ -81,7 +81,7 @@ export function useRecommendations(limit = 10) {
   const { user } = useAuthStore();
 
   return useGetQuery<Recommendation[]>(
-    ['recommendations', user?.id],
+    ['recommendations', user?.id || ''],
     `/api/recommendations/${user?.id || 'anonymous'}?limit=${limit}`,
     {
       enabled: !!user?.id, // Only fetch if user is logged in
@@ -95,7 +95,7 @@ export function useRecommendations(limit = 10) {
  */
 export function useRecommendationsTrending(limit = 20) {
   return useGetQuery<TrendingVideo[]>(
-    ['recommendations-trending', limit],
+    ['recommendations-trending', `${limit}`],
     `/api/recommendations/trending?limit=${limit}`,
     {
       staleTime: 30 * 60 * 1000, // 30 minutes

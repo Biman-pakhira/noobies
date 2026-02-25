@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { db } from '@video-platform/db';
-import { authMiddleware } from '../middleware/auth';
+// unused
 
 /**
  * Get current user profile
@@ -152,7 +152,7 @@ async function getLikedVideos(request: FastifyRequest, reply: FastifyReply) {
     return reply.send({
       success: true,
       data: {
-        items: interactions.map((i) => i.video),
+        items: interactions.map((i: any) => i.video),
         total,
         page,
         pageSize,

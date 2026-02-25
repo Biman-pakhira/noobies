@@ -488,7 +488,7 @@ class ElasticsearchService {
       const stats = await this.client.indices.stats({
         index: VIDEOS_INDEX,
       });
-      return stats.indices[VIDEOS_INDEX];
+      return stats.indices?.[VIDEOS_INDEX] || null;
     } catch (error) {
       console.error('Error getting stats:', error);
       return null;

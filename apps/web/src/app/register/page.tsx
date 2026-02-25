@@ -110,10 +110,10 @@ export default function RegisterPage() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={registerMutation.isLoading}
+              disabled={registerMutation.isPending}
               className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition mt-6"
             >
-              {registerMutation.isLoading ? 'Creating account...' : 'Sign Up'}
+              {registerMutation.isPending ? 'Creating account...' : 'Sign Up'}
             </button>
           </form>
 

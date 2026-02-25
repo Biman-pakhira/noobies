@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { JWTPayload } from '@video-platform/types';
+// unused
 
 /**
  * Extend FastifyRequest to include user from JWT
@@ -13,11 +13,7 @@ declare global {
   }
 }
 
-declare module 'fastify' {
-  interface FastifyRequest {
-    user?: JWTPayload;
-  }
-}
+// augment handled in types/fastify.d.ts
 
 /**
  * Authentication middleware to verify JWT

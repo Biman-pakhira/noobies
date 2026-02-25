@@ -171,9 +171,8 @@ async function getVideoStream(request: FastifyRequest, reply: FastifyReply) {
       });
     }
 
-    // Return HLS master playlist URL or redirect to CDN
     const resolution = (request.query as any).resolution || '720p';
-    const hlsFile = video.videoFiles.find((f) => f.resolution === `RES_${resolution.toUpperCase()}`);
+    const hlsFile = video.videoFiles.find((f: any) => f.resolution === `RES_${resolution.toUpperCase()}`);
 
     if (!hlsFile) {
       return reply.status(404).send({

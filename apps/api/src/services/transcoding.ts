@@ -1,4 +1,4 @@
-import { Queue, Worker, QueueEvents } from 'bullmq';
+import { Queue, Worker } from 'bullmq';
 import Redis from 'ioredis';
 import { db } from '@video-platform/db';
 import { getStorageProvider } from './storage';
@@ -113,8 +113,8 @@ export class TranscodingQueue {
           // Upload to storage
           job.updateProgress(90);
           console.log(`☁️ Uploading files to storage for ${videoId}`);
-          const storage = getStorageProvider();
-          const uploadedFiles = await uploadToStorage(videoId, outputDir, transcodeResults, thumbnailPath);
+          // unused
+          const uploadedFiles = await uploadToStorage(videoId, transcodeResults, thumbnailPath);
 
           // Save video files and thumbnails to database
           job.updateProgress(95);
@@ -235,7 +235,6 @@ export class TranscodingQueue {
  */
 async function uploadToStorage(
   videoId: string,
-  outputDir: string,
   transcodeResults: TranscodeResult[],
   thumbnailPath: string
 ) {

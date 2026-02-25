@@ -88,7 +88,7 @@ async function getTrendingRecommendations(request: FastifyRequest, reply: Fastif
 /**
  * Trigger model training/update
  */
-async function trainRecommendations(request: FastifyRequest, reply: FastifyReply) {
+async function trainRecommendations(_request: FastifyRequest, reply: FastifyReply) {
   try {
     // Verify admin auth if needed
     // await request.jwtVerify();
@@ -120,7 +120,7 @@ async function trainRecommendations(request: FastifyRequest, reply: FastifyReply
 /**
  * Get recommendation service stats
  */
-async function getRecommendationStats(request: FastifyRequest, reply: FastifyReply) {
+async function getRecommendationStats(_request: FastifyRequest, reply: FastifyReply) {
   try {
     try {
       const response = await axios.get(`${RECOMMENDER_URL}/api/recommendations/stats`, {
@@ -157,11 +157,4 @@ export async function registerRecommendationRoutes(fastify: FastifyInstance) {
   fastify.get('/api/recommendations/trending', getTrendingRecommendations);
   fastify.post('/api/recommendations/train', trainRecommendations);
   fastify.get('/api/recommendations/stats', getRecommendationStats);
-}
-
-/**
- * Register recommendation routes
- */
-export async function registerRecommendationRoutes(fastify: FastifyInstance) {
-  fastify.get('/api/recommendations', getRecommendations);
 }

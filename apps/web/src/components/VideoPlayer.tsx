@@ -43,8 +43,10 @@ export function VideoPlayer({ url, poster, title, className }: VideoPlayerProps)
         // Native HLS support (Safari)
         video.src = url;
       }
+      return;
     } else {
       video.src = url;
+      return;
     }
   }, [url]);
 

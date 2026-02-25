@@ -37,11 +37,13 @@ apiClient.interceptors.response.use(
           });
 
           token = response.data.data.accessToken;
-          localStorage.setItem('accessToken', token);
-          localStorage.setItem('refreshToken', response.data.data.refreshToken);
+          if (token) {
+            localStorage.setItem('accessToken', token);
+            localStorage.setItem('refreshToken', response.data.data.refreshToken);
 
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return apiClient(originalRequest);
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiClient(originalRequest);
+          }
         }
       } catch (refreshError) {
         localStorage.removeItem('accessToken');

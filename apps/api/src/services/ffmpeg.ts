@@ -139,13 +139,14 @@ export async function generateThumbnail(
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
-      .screenshot({
-        timestamps: [timestamp],
+      .screenshots({
+        count: 1,
+        timemarks: [timestamp.toString()],
         filename: path.basename(outputPath),
         folder: path.dirname(outputPath),
         size: '320x180',
       })
-      .on('end', resolve)
+      .on('end', () => resolve())
       .on('error', reject);
   });
 }
@@ -167,7 +168,7 @@ export async function extractFrame(
         folder: path.dirname(outputPath),
         size: '320x180',
       })
-      .on('end', resolve)
+      .on('end', () => resolve())
       .on('error', reject);
   });
 }

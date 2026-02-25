@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyMultipart from '@fastify/multipart';
 import { db } from '@video-platform/db';
 import { getTranscodingQueue } from '../services/transcoding';
-import { z } from 'zod';
+// unused
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -98,7 +98,7 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
 
     await new Promise((resolve, reject) => {
       videoFile.file.pipe(writeStream);
-      writeStream.on('finish', resolve);
+      writeStream.on('finish', () => resolve(true));
       writeStream.on('error', reject);
     });
 

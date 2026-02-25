@@ -75,8 +75,8 @@ export default function SearchPage() {
         if (filters.maxDuration) params.append('maxDuration', filters.maxDuration.toString());
 
         const response = await apiClient.get<SearchResponse>(`/search?${params.toString()}`);
-        setResults(response.data.data.items);
-        setTotal(response.data.data.total);
+        setResults(response.data.items);
+        setTotal(response.data.total);
       } catch (error: any) {
         if (error.response?.status !== 503) {
           toast.error('Failed to search videos');
