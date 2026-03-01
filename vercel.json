@@ -1,0 +1,6 @@
+{
+  "buildCommand": "turbo run build --filter=!@video-platform/recommender",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
