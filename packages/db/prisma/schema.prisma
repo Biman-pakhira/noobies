@@ -1,16 +1,10 @@
-// This is your Prisma schema file for MongoDB
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mongodb"
-  url      = env("DATABASE_URL")
 }
-
-// ============= ENUMS =============
 
 enum UserRole {
   USER
@@ -44,20 +38,17 @@ enum ReportStatus {
   RESOLVED
 }
 
-// ============= CORE MODELS =============
-
 model User {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  username  String     @unique
-  email     String     @unique
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  username     String     @unique
+  email        String     @unique
   passwordHash String
-  role      UserRole   @default(USER)
-  bio       String?
-  avatarUrl String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  role         UserRole   @default(USER)
+  bio          String?
+  avatarUrl    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
-  // Relations
   videos            Video[]
   comments          Comment[]
   watchHistory      WatchHistory[]
@@ -65,9 +56,6 @@ model User {
   interactions      VideoInteraction[]
   reports           Report[]
   refreshTokens     RefreshToken[]
-
-  @@index([email])
-  @@index([username])
 }
 
 model Video {
@@ -77,25 +65,24 @@ model Video {
   uploaderId  String      @db.ObjectId
   uploader    User        @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
   status      VideoStatus @default(UPLOADED)
-  duration    Int         // in seconds
+  duration    Int
   views       Int         @default(0)
   likes       Int         @default(0)
   dislikes    Int         @default(0)
   isPublic    Boolean     @default(true)
+  tagIds      String[]    @db.ObjectId
+  categoryId  String?     @db.ObjectId
+  category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  // Relations
-  videoFiles      VideoFile[]
-  thumbnails      Thumbnail[]
-  tags            Tag[]
-  categoryId      String?    @db.ObjectId
-  category        Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  comments        Comment[]
-  watchHistory    WatchHistory[]
-  playlistVideos  PlaylistVideo[]
-  interactions    VideoInteraction[]
-  reports         Report[]
+  videoFiles     VideoFile[]
+  thumbnails     Thumbnail[]
+  comments       Comment[]
+  watchHistory   WatchHistory[]
+  playlistVideos PlaylistVideo[]
+  interactions   VideoInteraction[]
+  reports        Report[]
 
   @@index([uploaderId])
   @@index([status])
@@ -103,18 +90,24 @@ model Video {
   @@index([createdAt])
 }
 
-model VideoFile {
-  id          String          @id @default(auto()) @map("_id") @db.ObjectId
-  videoId     String          @db.ObjectId
-  video       Video           @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  resolution  VideoResolution
-  fileUrl     String
-  format      String          @default("hls") // "hls" or "mp4"
-  size        Int             // in bytes
-  bitrate     Int             // in kbps
-  createdAt   DateTime        @default(now())
+model Tag {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+}
 
-  @@index([videoId, resolution])
+model VideoFile {
+  id         String          @id @default(auto()) @map("_id") @db.ObjectId
+  videoId    String          @db.ObjectId
+  video      Video           @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  resolution VideoResolution
+  fileUrl    String
+  format     String          @default("hls")
+  size       Int
+  bitrate    Int
+  createdAt  DateTime        @default(now())
+
   @@index([videoId])
 }
 
@@ -123,7 +116,7 @@ model Thumbnail {
   videoId   String   @db.ObjectId
   video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
   url       String
-  timestamp Int      // seconds into the video
+  timestamp Int
   createdAt DateTime @default(now())
 
   @@index([videoId])
@@ -137,20 +130,7 @@ model Category {
   iconUrl     String?
   createdAt   DateTime @default(now())
 
-  // Relations
   videos Video[]
-}
-
-model Tag {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String   @unique
-  slug      String   @unique
-  createdAt DateTime @default(now())
-
-  // Relations
-  videos Video[]
-
-  @@index([slug])
 }
 
 model Comment {
@@ -167,41 +147,36 @@ model Comment {
 
   @@index([videoId])
   @@index([userId])
-  @@index([createdAt])
 }
 
 model WatchHistory {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String   @db.ObjectId
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  videoId          String   @db.ObjectId
-  video            Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  progressSeconds  Int      @default(0) // last watched position
-  watchedAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId         String   @db.ObjectId
+  video           Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  progressSeconds Int      @default(0)
+  watchedAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  @@index([userId, videoId])
   @@index([userId])
   @@index([videoId])
-  @@index([watchedAt])
 }
 
 model Playlist {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String
-  description String?
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
   thumbnailUrl String?
-  isPublic    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isPublic     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  // Relations
   videos PlaylistVideo[]
 
   @@index([userId])
-  @@index([createdAt])
 }
 
 model PlaylistVideo {
@@ -210,10 +185,9 @@ model PlaylistVideo {
   playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
   videoId    String   @db.ObjectId
   video      Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  position   Int      // order in playlist
+  position   Int
   addedAt    DateTime @default(now())
 
-  @@index([playlistId, videoId])
   @@index([playlistId])
   @@index([videoId])
 }
@@ -227,31 +201,25 @@ model VideoInteraction {
   type      InteractionType
   createdAt DateTime        @default(now())
 
-  @@index([userId, videoId])
   @@index([userId])
   @@index([videoId])
-  @@index([type])
 }
 
 model Report {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  videoId   String       @db.ObjectId
-  video     Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  userId    String       @db.ObjectId
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reason    String
-  status    ReportStatus @default(PENDING)
-  notes     String?
-  createdAt DateTime     @default(now())
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  videoId    String       @db.ObjectId
+  video      Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  userId     String       @db.ObjectId
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reason     String
+  status     ReportStatus @default(PENDING)
+  notes      String?
+  createdAt  DateTime     @default(now())
   resolvedAt DateTime?
 
   @@index([videoId])
-  @@index([userId])
   @@index([status])
-  @@index([createdAt])
 }
-
-// ============= AUTH MODELS =============
 
 model RefreshToken {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -262,41 +230,4 @@ model RefreshToken {
   createdAt DateTime @default(now())
 
   @@index([userId])
-  @@index([expiresAt])
-}
-
-// ============= ANALYTICS MODELS =============
-
-model VideoAnalytics {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  videoId         String
-  date            DateTime
-  viewsCount      Int      @default(0)
-  uniqueViewers   Int      @default(0)
-  watchTime       Int      @default(0) // total seconds watched
-  avgWatchPercent Float    @default(0)
-  likesCount      Int      @default(0)
-  dislikesCount   Int      @default(0)
-  commentsCount   Int      @default(0)
-  shareCount      Int      @default(0)
-  createdAt       DateTime @default(now())
-
-  @@index([videoId, date])
-  @@index([videoId])
-  @@index([date])
-}
-
-model UserAnalytics {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String
-  date            DateTime
-  videosWatched   Int      @default(0)
-  watchTime       Int      @default(0)
-  videosUploaded  Int      @default(0)
-  engagementScore Float    @default(0)
-  createdAt       DateTime @default(now())
-
-  @@index([userId, date])
-  @@index([userId])
-  @@index([date])
 }
