@@ -2,18 +2,18 @@ import Fastify from 'fastify';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCors from '@fastify/cors';
 import fastifyHelmet from '@fastify/helmet';
-import { createErrorHandler } from './utils/error';
-import { registerAuthRoutes } from './routes/auth';
-import { registerUserRoutes } from './routes/users';
-import { registerVideoRoutes } from './routes/videos';
-import { registerCommentRoutes } from './routes/comments';
-import { registerInteractionRoutes } from './routes/interactions';
-import { registerRecommendationRoutes } from './routes/recommendations';
-import { registerVideoUploadRoutes } from './routes/upload';
-import { registerSearchRoutes } from './routes/search';
-import { registerAdminRoutes } from './routes/admin';
-import { getTranscodingQueue } from './services/transcoding';
-import { getElasticsearchService } from './services/elasticsearch';
+import { createErrorHandler } from './utils/error.js';
+import { registerAuthRoutes } from './routes/auth.js';
+import { registerUserRoutes } from './routes/users.js';
+import { registerVideoRoutes } from './routes/videos.js';
+import { registerCommentRoutes } from './routes/comments.js';
+import { registerInteractionRoutes } from './routes/interactions.js';
+import { registerRecommendationRoutes } from './routes/recommendations.js';
+import { registerVideoUploadRoutes } from './routes/upload.js';
+import { registerSearchRoutes } from './routes/search.js';
+import { registerAdminRoutes } from './routes/admin.js';
+import { getTranscodingQueue } from './services/transcoding.js';
+import { getElasticsearchService } from './services/elasticsearch.js';
 
 /**
  * Initialize Fastify app
@@ -42,7 +42,7 @@ export async function createApp() {
 
   // Register JWT plugin
   await fastify.register(fastifyJwt, {
-    secret: process.env.JWT_SECRET,
+    secret: process.env.JWT_SECRET || "fallback-dev-secret-change-in-production",
   });
 
   // Health check route

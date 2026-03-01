@@ -1,6 +1,6 @@
-import VideoCard from './components/VideoCard';
-import CategoryNav from './components/CategoryNav';
-import Header from './components/Header';
+import VideoCard from './components/VideoCard'
+import CategoryNav from './components/CategoryNav'
+import Header from './components/Header'
 
 const MOCK_VIDEOS = [
   { id: '1', title: 'Amazing Nature Documentary', views: 1200000, duration: '45:23', uploader: 'NatureChannel', thumbnail: 'https://picsum.photos/seed/1/320/180' },
@@ -11,21 +11,48 @@ const MOCK_VIDEOS = [
   { id: '6', title: 'Building a React App from Scratch', views: 980000, duration: '1:15:30', uploader: 'DevTalks', thumbnail: 'https://picsum.photos/seed/6/320/180' },
   { id: '7', title: 'Jazz Piano Improvisation Basics', views: 430000, duration: '28:55', uploader: 'MusicSchool', thumbnail: 'https://picsum.photos/seed/7/320/180' },
   { id: '8', title: 'History of Ancient Rome', views: 1750000, duration: '52:40', uploader: 'HistoryVault', thumbnail: 'https://picsum.photos/seed/8/320/180' },
-];
+]
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Header />
       <CategoryNav />
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-200">Trending Videos</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <main className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6">
+        <h2 className="text-lg md:text-xl font-semibold mb-4 text-gray-200">Trending Videos</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {MOCK_VIDEOS.map(video => (
             <VideoCard key={video.id} {...video} />
           ))}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex justify-around items-center h-14 z-50">
+        <a href="/" className="flex flex-col items-center gap-0.5 text-red-500">
+          <span className="text-xl">🏠</span>
+          <span className="text-xs">Home</span>
+        </a>
+        <a href="#" className="flex flex-col items-center gap-0.5 text-gray-400">
+          <span className="text-xl">🔥</span>
+          <span className="text-xs">Trending</span>
+        </a>
+        <a href="#" className="flex flex-col items-center gap-0.5 text-gray-400">
+          <span className="text-xl">➕</span>
+          <span className="text-xs">Upload</span>
+        </a>
+        <a href="#" className="flex flex-col items-center gap-0.5 text-gray-400">
+          <span className="text-xl">📚</span>
+          <span className="text-xs">Library</span>
+        </a>
+        <a href="/login" className="flex flex-col items-center gap-0.5 text-gray-400">
+          <span className="text-xl">👤</span>
+          <span className="text-xs">Profile</span>
+        </a>
+      </nav>
+
+      {/* Bottom padding for mobile nav */}
+      <div className="md:hidden h-14" />
     </div>
-  );
+  )
 }

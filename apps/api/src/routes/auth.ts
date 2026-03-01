@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { db } from '@video-platform/db';
-import { hashPassword, verifyPassword } from '../utils/password';
-import { JWT_CONFIG } from '../utils/jwt';
-import { registerSchema, loginSchema, refreshSchema, RegisterInput, LoginInput, RefreshInput } from '../schemas/auth';
+import { hashPassword, verifyPassword } from '../utils/password.js';
+import { JWT_CONFIG } from '../utils/jwt.js';
+import { registerSchema, loginSchema, refreshSchema, RegisterInput, LoginInput, RefreshInput } from '../schemas/auth.js';
 // unused
 
 /**

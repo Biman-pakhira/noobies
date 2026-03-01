@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { getElasticsearchService } from '../services/elasticsearch';
+import { getElasticsearchService } from '../services/elasticsearch.js';
 
 /**
  * Search videos with full-text search

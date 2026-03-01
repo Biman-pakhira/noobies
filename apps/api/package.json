@@ -1,13 +1,13 @@
 {
   "name": "@video-platform/api",
+  "type": "module",
   "version": "1.0.0",
   "description": "Fastify backend API for video streaming platform",
   "main": "dist/index.js",
-  "type": "module",
   "private": true,
   "scripts": {
-    "dev": "node --loader ts-node/esm src/server.ts",
-    "worker": "node --loader ts-node/esm src/worker.ts",
+    "dev": "tsx src/server.ts",
+    "worker": "tsx src/worker.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "worker:start": "node dist/worker.js",
@@ -21,25 +21,27 @@
     "eslint": "^8.55.0",
     "prettier": "^3.1.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^8.10.0",
-    "@fastify/cors": "^8.4.2",
+    "@fastify/cors": "^8.5.0",
     "@fastify/helmet": "^11.1.1",
     "@fastify/jwt": "^7.2.4",
     "@fastify/multipart": "^8.0.0",
     "@prisma/client": "^5.7.0",
-    "@video-platform/types": "*",
     "@video-platform/db": "*",
+    "@video-platform/types": "*",
     "aws-sdk": "^2.1500.0",
     "axios": "^1.6.5",
     "bullmq": "^5.7.0",
+    "dotenv": "^16.6.1",
     "fastify": "^4.25.1",
     "fluent-ffmpeg": "^2.1.2",
     "ioredis": "^5.3.2",
     "pino": "^8.17.2",
-    "pino-pretty": "^10.2.3",
+    "pino-pretty": "^10.3.1",
     "zod": "^3.22.4"
   }
 }

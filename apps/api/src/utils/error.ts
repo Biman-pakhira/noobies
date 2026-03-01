@@ -1,64 +1,22 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
-
-export interface ApiErrorResponse {
-  success: false;
-  error: {
-    message: string;
-    code: string;
-    details?: unknown;
-  };
-  timestamp: number;
-}
-
-export class ApiError extends Error {
-  constructor(
-    public statusCode: number,
-    public code: string,
-    message: string,
-    public details?: unknown
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
+import { FastifyError, FastifyReply, FastifyRequest } from 'fastify'
 
 export function createErrorHandler() {
-  return async (error: Error, _request: FastifyRequest, reply: FastifyReply) => {
-    if (error instanceof ApiError) {
-      return reply.status(error.statusCode).send({
-        success: false,
-        error: {
-          message: error.message,
-          code: error.code,
-          ...(error.details ? { details: error.details } : {}),
-        },
-        timestamp: Date.now(),
-      } as ApiErrorResponse);
-    }
+  return function (
+    error: FastifyError,
+    request: FastifyRequest,
+    reply: FastifyReply
+  ) {
+    const statusCode = error.statusCode || 500
 
-    // Handle Zod validation errors
-    if (error.name === 'ZodError') {
-      return reply.status(400).send({
-        success: false,
-        error: {
-          message: 'Validation error',
-          code: 'INVALID_INPUT',
-          details: (error as any).errors,
-        },
-        timestamp: Date.now(),
-      } as ApiErrorResponse);
-    }
+    request.log.error(error)
 
-    // Log unexpected errors
-    console.error('Unexpected error:', error);
-
-    return reply.status(500).send({
+    return reply.status(statusCode).send({
       success: false,
       error: {
-        message: 'Internal server error',
-        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message || 'Internal Server Error',
+        code: error.code || 'INTERNAL_ERROR',
       },
       timestamp: Date.now(),
-    } as ApiErrorResponse);
-  };
+    })
+  }
 }

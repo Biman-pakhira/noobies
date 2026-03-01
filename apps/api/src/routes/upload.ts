@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyMultipart from '@fastify/multipart';
 import { db } from '@video-platform/db';
-import { getTranscodingQueue } from '../services/transcoding';
+import { getTranscodingQueue } from '../services/transcoding.js';
 // unused
 import { promises as fs } from 'fs';
 import path from 'path';

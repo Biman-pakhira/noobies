@@ -5,7 +5,7 @@
  * Can be run as a separate process using: npm run worker
  */
 
-import { getTranscodingQueue } from './services/transcoding';
+import { getTranscodingQueue } from './services/transcoding.js';
 
 async function startWorker() {
   console.log('🎬 Starting video transcoding worker...');
