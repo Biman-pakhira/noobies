@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCors from '@fastify/cors';
 import fastifyHelmet from '@fastify/helmet';
+import { authMiddleware, optionalAuthMiddleware } from './middleware/auth.js';
 import { createErrorHandler } from './utils/error.js';
 import { registerAuthRoutes } from './routes/auth.js';
 import { registerUserRoutes } from './routes/users.js';
@@ -44,6 +45,10 @@ export async function createApp() {
   await fastify.register(fastifyJwt, {
     secret: process.env.JWT_SECRET || "fallback-dev-secret-change-in-production",
   });
+
+  // Attach authentication helpers to fastify instance
+  fastify.decorate('authenticate', async (request, reply) => authMiddleware(request as any, reply as any));
+  fastify.decorate('optionalAuthenticate', async (request, reply) => optionalAuthMiddleware(request as any, reply as any));
 
   // Health check route
   fastify.get('/health', async (_request, reply) => {

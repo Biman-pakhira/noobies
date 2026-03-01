@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { db } from '@video-platform/db';
+import db from '@video-platform/db';
 // unused
 
 /**
