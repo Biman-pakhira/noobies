@@ -15,14 +15,13 @@ export default function LoginPage() {
 
   const loginMutation = usePostMutation<{
     user: any;
-    accessToken: string;
-    refreshToken: string;
+    tokens: { accessToken: string; refreshToken: string };
   }>(
     '/api/auth/login',
     {
       onSuccess: (data) => {
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('accessToken', data.tokens.accessToken);
+        localStorage.setItem('refreshToken', data.tokens.refreshToken);
         setUser(data.user);
         toast.success('Login successful!');
         router.push('/');

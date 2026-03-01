@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
           token = response.data.data.accessToken;
           if (token) {
             localStorage.setItem('accessToken', token);
-            localStorage.setItem('refreshToken', response.data.data.refreshToken);
+            // refreshToken stays the same — the refresh endpoint only returns a new accessToken
 
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return apiClient(originalRequest);
