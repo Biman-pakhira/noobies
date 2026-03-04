@@ -13,6 +13,7 @@ import { registerRecommendationRoutes } from './routes/recommendations.js';
 import { registerVideoUploadRoutes } from './routes/upload.js';
 import { registerSearchRoutes } from './routes/search.js';
 import { registerAdminRoutes } from './routes/admin.js';
+import { registerDebugRoutes } from './routes/debug.js';
 import { getTranscodingQueue } from './services/transcoding.js';
 import { getElasticsearchService } from './services/elasticsearch.js';
 
@@ -68,6 +69,7 @@ export async function createApp() {
   await registerVideoUploadRoutes(fastify);
   await registerSearchRoutes(fastify);
   await registerAdminRoutes(fastify);
+  await registerDebugRoutes(fastify);
 
   // Initialize Elasticsearch
   const esService = getElasticsearchService();
