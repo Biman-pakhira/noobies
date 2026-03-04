@@ -10,7 +10,7 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:seed": "ts-node --esm prisma/seed.ts",
-    "build": "mkdir -p dist && cp src/*.js src/*.d.ts src/*.map dist/ 2>/dev/null; echo 'DB package built'",
+    "build": "prisma generate && mkdir -p dist && cp src/*.js src/*.d.ts src/*.map dist/ 2>/dev/null; echo 'DB package built'",
     "dev": "echo 'DB package in dev'"
   },
   "prisma": {
