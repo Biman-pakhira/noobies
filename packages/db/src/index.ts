@@ -7,3 +7,6 @@ export const db = new PrismaClient({
     },
   },
 })
+
+// Default export for compatibility with callers using default imports
+export default db

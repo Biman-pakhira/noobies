@@ -1,7 +1,7 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'StreamX - Video Platform',
+  title: 'Noobies',
   description: 'Watch and share videos',
 }
 

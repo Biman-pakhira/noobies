@@ -17,11 +17,11 @@
     "seed": "ts-node --esm prisma/seed.ts"
   },
   "devDependencies": {
-    "prisma": "^5.7.0",
+    "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@prisma/client": "^5.7.0"
+    "@prisma/client": "^5.22.0"
   }
 }

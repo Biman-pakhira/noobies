@@ -141,9 +141,7 @@ async function main() {
         likes: 85,
         dislikes: 5,
         isPublic: true,
-        tags: {
-          connect: [{ id: tags[1].id }, { id: tags[4].id }],
-        },
+        tagIds: [tags[1].id, tags[4].id],
       },
     }),
     prisma.video.create({
@@ -158,9 +156,7 @@ async function main() {
         likes: 156,
         dislikes: 8,
         isPublic: true,
-        tags: {
-          connect: [{ id: tags[2].id }, { id: tags[4].id }],
-        },
+        tagIds: [tags[2].id, tags[4].id],
       },
     }),
     prisma.video.create({
@@ -175,9 +171,7 @@ async function main() {
         likes: 320,
         dislikes: 12,
         isPublic: true,
-        tags: {
-          connect: [{ id: tags[5].id }, { id: tags[7].id }],
-        },
+        tagIds: [tags[5].id, tags[7].id],
       },
     }),
     prisma.video.create({
@@ -192,9 +186,7 @@ async function main() {
         likes: 210,
         dislikes: 3,
         isPublic: true,
-        tags: {
-          connect: [{ id: tags[6].id }],
-        },
+        tagIds: [tags[6].id],
       },
     }),
     prisma.video.create({
@@ -209,9 +201,7 @@ async function main() {
         likes: 72,
         dislikes: 4,
         isPublic: true,
-        tags: {
-          connect: [{ id: tags[0].id }, { id: tags[3].id }],
-        },
+        tagIds: [tags[0].id, tags[3].id],
       },
     }),
   ]);

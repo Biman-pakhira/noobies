@@ -21,7 +21,7 @@ export default function Header() {
         
         {/* Logo */}
         <Link href="/" className="text-xl md:text-2xl font-bold text-red-500 shrink-0">
-          ▶ <span className="hidden sm:inline">StreamX</span>
+          ▶ <span className="hidden sm:inline">Noobies</span>
         </Link>
 
         {/* Search - desktop */}
