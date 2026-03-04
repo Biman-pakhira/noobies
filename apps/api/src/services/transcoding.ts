@@ -1,16 +1,42 @@
+import { Queue } from 'bullmq';
+import { Redis } from 'ioredis';
+
+const connection = new Redis({
+  host: process.env.REDIS_HOST || 'localhost',
+  port: parseInt(process.env.REDIS_PORT || '6379'),
+  maxRetriesPerRequest: null,
+});
+
+const transcodingQueue = new Queue('video-processing', { connection });
+
 export function getTranscodingQueue() {
   return {
     startWorker: () => {
-      console.log('⚠️  Transcoding worker disabled in development')
+      console.log('🚀 Transcoding queue initialized');
     },
-    stopWorker: async () => {},
-    addJob: async (data: any) => {
-      console.log('Transcoding job queued:', data)
+    stopWorker: async () => {
+      await transcodingQueue.close();
     },
-    getJobStatus: async (jobId: string) => ({
-      id: jobId,
-      status: 'unknown',
-      progress: 0,
-    }),
-  }
+    addJob: async (data: { videoId: string; uploadPath: string; resolutions: string[] }) => {
+      const job = await transcodingQueue.add('transcode', data, {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 1000,
+        },
+      });
+      return job.id;
+    },
+    getJobStatus: async (jobId: string) => {
+      const job = await transcodingQueue.getJob(jobId);
+      if (!job) return null;
+
+      const state = await job.getState();
+      return {
+        id: job.id,
+        status: state,
+        progress: job.progress,
+      };
+    },
+  };
 }

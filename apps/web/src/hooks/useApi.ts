@@ -36,6 +36,31 @@ export function usePostMutation<T, V = any>(
   });
 }
 
+export function useUploadMutation<T, V = any>(
+  url: string,
+  onProgress?: (progress: number) => void,
+  options?: UseMutationOptions<T, any, V>
+) {
+  return useMutation<T, any, V>({
+    mutationFn: async (data: V) => {
+      const response = await apiClient.post(url, data, {
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total) {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            onProgress(progress);
+          }
+        },
+      });
+      return response.data.data;
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.error?.message || 'An error occurred';
+      toast.error(message);
+    },
+    ...options,
+  });
+}
+
 export function useDeleteMutation<T>(
   url: string,
   options?: UseMutationOptions<T, any, void>

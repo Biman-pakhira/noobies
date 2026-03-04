@@ -1,0 +1,111 @@
+import AWS from 'aws-sdk';
+import { promises as fs } from 'fs';
+/**
+ * S3/CloudFlare R2 storage implementation
+ */
+export class S3StorageProvider {
+    constructor() {
+        Object.defineProperty(this, "s3Client", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "bucket", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "region", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "cdnUrl", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        const useR2 = process.env.R2_ACCOUNT_ID && process.env.R2_ACCESS_KEY_ID;
+        if (useR2) {
+            // Cloudflare R2
+            this.s3Client = new AWS.S3({
+                accessKeyId: process.env.R2_ACCESS_KEY_ID,
+                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+                endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+                s3ForcePathStyle: true,
+                signatureVersion: 'v4',
+            });
+            this.bucket = process.env.R2_BUCKET_NAME || 'video-platform-videos';
+            this.region = process.env.R2_REGION || 'us-east-1';
+            this.cdnUrl = process.env.CDN_URL || `https://${this.bucket}.cdn.example.com`;
+        }
+        else {
+            // AWS S3
+            this.s3Client = new AWS.S3({
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                region: process.env.AWS_REGION || 'us-east-1',
+            });
+            this.bucket = process.env.AWS_S3_BUCKET || 'video-platform-videos';
+            this.region = process.env.AWS_REGION || 'us-east-1';
+            this.cdnUrl = process.env.CDN_URL || `https://${this.bucket}.s3.${this.region}.amazonaws.com`;
+        }
+    }
+    async uploadFile(filePath, key, contentType) {
+        try {
+            const fileBuffer = await fs.readFile(filePath);
+            await this.s3Client
+                .upload({
+                Bucket: this.bucket,
+                Key: key,
+                Body: fileBuffer,
+                ContentType: contentType,
+                ACL: 'public-read',
+            })
+                .promise();
+            return this.getFileUrl(key);
+        }
+        catch (error) {
+            console.error(`Failed to upload file to S3: ${filePath}`, error);
+            throw error;
+        }
+    }
+    async deleteFile(key) {
+        try {
+            await this.s3Client
+                .deleteObject({
+                Bucket: this.bucket,
+                Key: key,
+            })
+                .promise();
+        }
+        catch (error) {
+            console.error(`Failed to delete file from S3: ${key}`, error);
+            throw error;
+        }
+    }
+    async getUrl(key) {
+        return this.getFileUrl(key);
+    }
+    getFileUrl(key) {
+        return `${this.cdnUrl}/${key}`;
+    }
+}
+/**
+ * Get storage provider instance
+ */
+let storageInstance = null;
+export function getStorageProvider() {
+    if (!storageInstance) {
+        storageInstance = new S3StorageProvider();
+    }
+    return storageInstance;
+}
+export function setStorageProvider(provider) {
+    storageInstance = provider;
+}
+//# sourceMappingURL=storage.js.map

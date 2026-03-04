@@ -39,7 +39,7 @@ export function Navigation() {
               </svg>
             </div>
             <span className="text-xl font-bold text-white hidden sm:inline">
-              VideoHub
+              noobies
             </span>
           </Link>
 

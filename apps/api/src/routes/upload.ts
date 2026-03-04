@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyMultipart from '@fastify/multipart';
-import db from '../lib/db';
+import db from '../lib/db.js';
 import { getTranscodingQueue } from '../services/transcoding.js';
 // unused
 import { promises as fs } from 'fs';
@@ -31,19 +31,52 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
       });
     }
 
-    const parts = request.parts();
-    let videoFile: any = null;
+    // Create temporary file
+    const uploadDir = process.env.FFMPEG_OUTPUT_DIR || '/tmp/video-processing';
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    let videoFile: { filename: string, mimetype: string } | null = null;
     let title = '';
     let description = '';
     let categoryId = '';
     let tagNames: string[] = [];
+    let tempPath = '';
+    let fileName = '';
 
-    // Parse multipart form data
+    const allowedMimeTypes = [
+      'video/mp4',
+      'video/quicktime',
+      'video/x-msvideo',
+      'video/x-matroska',
+    ];
+
+    const parts = request.parts();
     for await (const part of parts) {
-      if (part.type === 'file') {
-        if (part.fieldname === 'video') {
-          videoFile = part;
+      if (part.type === 'file' && part.fieldname === 'video') {
+        if (!allowedMimeTypes.includes(part.mimetype)) {
+          return reply.status(400).send({
+            success: false,
+            error: {
+              message: `Invalid video format. Allowed: ${allowedMimeTypes.join(', ')}`,
+              code: 'INVALID_FORMAT',
+            },
+          });
         }
+
+        fileName = `${Date.now()}-${part.filename}`;
+        tempPath = path.join(uploadDir, fileName);
+
+        const fileHandle = await fs.open(tempPath, 'w');
+        const writeStream = fileHandle.createWriteStream();
+
+        await new Promise((resolve, reject) => {
+          part.file.pipe(writeStream);
+          writeStream.on('finish', () => resolve(true));
+          writeStream.on('error', reject);
+        });
+
+        await fileHandle.close();
+        videoFile = { filename: part.filename, mimetype: part.mimetype };
       } else if (part.type === 'field') {
         if (part.fieldname === 'title') {
           title = part.value as string;
@@ -57,8 +90,8 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
       }
     }
 
-    // Validate input
-    if (!videoFile || !title) {
+    // Validate input after parsing all parts
+    if (!tempPath || !title) {
       return reply.status(400).send({
         success: false,
         error: {
@@ -67,40 +100,6 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
         },
       });
     }
-
-    // Validate file type
-    const allowedMimeTypes = [
-      'video/mp4',
-      'video/quicktime',
-      'video/x-msvideo',
-      'video/x-matroska',
-    ];
-
-    if (!allowedMimeTypes.includes(videoFile.mimetype)) {
-      return reply.status(400).send({
-        success: false,
-        error: {
-          message: `Invalid video format. Allowed: ${allowedMimeTypes.join(', ')}`,
-          code: 'INVALID_FORMAT',
-        },
-      });
-    }
-
-    // Create temporary file
-    const uploadDir = process.env.FFMPEG_OUTPUT_DIR || '/tmp/video-processing';
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    const fileName = `${Date.now()}-${videoFile.filename}`;
-    const tempPath = path.join(uploadDir, fileName);
-
-    // Save uploaded file to disk
-    const writeStream = (await fs.open(tempPath, 'w')).createWriteStream();
-
-    await new Promise((resolve, reject) => {
-      videoFile.file.pipe(writeStream);
-      writeStream.on('finish', () => resolve(true));
-      writeStream.on('error', reject);
-    });
 
     // Create video record
     const video = await db.video.create({
@@ -116,7 +115,6 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
 
     // Connect tags
     if (tagNames.length > 0) {
-      // Create tags if they don't exist, then connect
       const connectedTags = await Promise.all(
         tagNames.map(async (tagName) => {
           let tag = await db.tag.findFirst({
@@ -136,13 +134,10 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
         })
       );
 
-      // Connect tags to video
       await db.video.update({
         where: { id: video.id },
         data: {
-          tags: {
-            connect: connectedTags.map((t) => ({ id: t.id })),
-          },
+          tagIds: connectedTags.map((t) => t.id),
         },
       });
     }
@@ -183,6 +178,14 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
 async function getUploadStatus(request: FastifyRequest, reply: FastifyReply) {
   try {
     const { jobId } = request.params as { jobId: string };
+
+    // Basic ObjectID validation for MongoDB
+    if (!jobId || !/^[0-9a-fA-F]{24}$/.test(jobId)) {
+      return reply.status(400).send({
+        success: false,
+        error: { message: 'Invalid job or video ID format', code: 'INVALID_ID' },
+      });
+    }
 
     const transcodingQueue = getTranscodingQueue();
     const jobStatus = await transcodingQueue.getJobStatus(jobId);

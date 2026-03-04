@@ -1,4 +1,4 @@
-import { useGetQuery, usePostMutation } from './useApi';
+import { useGetQuery, usePostMutation, useUploadMutation } from './useApi';
 import { useAuthStore } from '@/lib/auth';
 
 export interface Video {
@@ -59,9 +59,10 @@ export function useTrendingVideos() {
   return useGetQuery<Video[]>(['trending'], '/api/videos/trending');
 }
 
-export function useUploadVideo() {
-  return usePostMutation<{ video: Video; job: any }, FormData>(
-    '/api/videos/upload'
+export function useUploadVideo(onProgress?: (progress: number) => void) {
+  return useUploadMutation<{ video: Video; job: any }, FormData>(
+    '/api/videos/upload',
+    onProgress
   );
 }
 

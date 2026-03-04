@@ -69,9 +69,9 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Welcome to VideoHub</h1>
+          <h1 className="text-4xl font-bold mb-4">Welcome to noobies</h1>
           <p className="text-gray-400 mb-6">
-            {user 
+            {user
               ? 'Discover personalized videos powered by AI recommendations'
               : 'Discover amazing videos from our community'}
           </p>
@@ -80,32 +80,29 @@ export default function Home() {
           <div className="flex gap-4 border-b border-gray-800 overflow-x-auto">
             <button
               onClick={() => setActiveTab('home')}
-              className={`pb-2 px-4 font-semibold transition whitespace-nowrap ${
-                activeTab === 'home'
+              className={`pb-2 px-4 font-semibold transition whitespace-nowrap ${activeTab === 'home'
                   ? 'text-red-500 border-b-2 border-red-500'
                   : 'text-gray-400 hover:text-white'
-              }`}
+                }`}
             >
               Home
             </button>
             <button
               onClick={() => setActiveTab('trending')}
-              className={`pb-2 px-4 font-semibold transition whitespace-nowrap ${
-                activeTab === 'trending'
+              className={`pb-2 px-4 font-semibold transition whitespace-nowrap ${activeTab === 'trending'
                   ? 'text-red-500 border-b-2 border-red-500'
                   : 'text-gray-400 hover:text-white'
-              }`}
+                }`}
             >
               Trending
             </button>
             {user && (
               <button
                 onClick={() => setActiveTab('recommendations')}
-                className={`pb-2 px-4 font-semibold transition whitespace-nowrap flex items-center gap-2 ${
-                  activeTab === 'recommendations'
+                className={`pb-2 px-4 font-semibold transition whitespace-nowrap flex items-center gap-2 ${activeTab === 'recommendations'
                     ? 'text-red-500 border-b-2 border-red-500'
                     : 'text-gray-400 hover:text-white'
-                }`}
+                  }`}
               >
                 <span>🤖</span>
                 For You

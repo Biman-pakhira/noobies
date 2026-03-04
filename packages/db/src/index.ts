@@ -1,12 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-export const db = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-})
+export const db = new PrismaClient()
 
-// Default export for compatibility with callers using default imports
+export * from '@prisma/client'
 export default db

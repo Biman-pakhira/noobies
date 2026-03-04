@@ -37,7 +37,6 @@ async function getVideos(request: FastifyRequest, reply: FastifyReply) {
         include: {
           uploader: { select: { id: true, username: true, avatarUrl: true } },
           thumbnails: { take: 1, select: { url: true } },
-          tags: { select: { name: true, slug: true } },
           category: { select: { id: true, name: true, slug: true } },
         },
         orderBy,
@@ -47,10 +46,17 @@ async function getVideos(request: FastifyRequest, reply: FastifyReply) {
       db.video.count({ where }),
     ]);
 
+    // Map thumbnails and uploader for the frontend
+    const mappedVideos = videos.map(video => ({
+      ...video,
+      author: video.uploader,
+      thumbnail: video.thumbnails[0] || null,
+    }));
+
     return reply.send({
       success: true,
       data: {
-        items: videos,
+        videos: mappedVideos,
         total,
         page,
         pageSize,
@@ -76,7 +82,6 @@ async function getVideoById(request: FastifyRequest, reply: FastifyReply) {
         uploader: { select: { id: true, username: true, avatarUrl: true, bio: true } },
         videoFiles: true,
         thumbnails: true,
-        tags: true,
         category: true,
         comments: {
           take: 10,
@@ -101,9 +106,16 @@ async function getVideoById(request: FastifyRequest, reply: FastifyReply) {
       data: { views: { increment: 1 } },
     });
 
+    // Map thumbnails and uploader for the frontend
+    const mappedVideo = {
+      ...video,
+      author: video.uploader,
+      thumbnail: video.thumbnails[0] || null,
+    };
+
     return reply.send({
       success: true,
-      data: video,
+      data: mappedVideo,
       timestamp: Date.now(),
     });
   } catch (error) {
@@ -135,9 +147,15 @@ async function getTrendingVideos(request: FastifyRequest, reply: FastifyReply) {
       take: limit,
     });
 
+    const mappedVideos = videos.map(video => ({
+      ...video,
+      author: video.uploader,
+      thumbnail: video.thumbnails[0] || null,
+    }));
+
     return reply.send({
       success: true,
-      data: videos,
+      data: mappedVideos,
       timestamp: Date.now(),
     });
   } catch (error) {

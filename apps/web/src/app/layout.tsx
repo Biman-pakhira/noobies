@@ -5,8 +5,8 @@ import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'VideoHub - Video Streaming Platform',
-  description: 'Watch and share videos with AI-powered recommendations',
+  title: 'noobies - Video Streaming Platform',
+  description: 'Watch and share videos on noobies',
 };
 
 export default function RootLayout({

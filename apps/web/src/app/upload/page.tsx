@@ -14,8 +14,12 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const uploadMutation = useUploadVideo();
+  const uploadMutation = useUploadVideo((progress) => {
+    setUploadProgress(progress);
+  });
   const statusQuery = useUploadStatus(jobId || '');
 
   useEffect(() => {
@@ -75,6 +79,9 @@ export default function UploadPage() {
       return;
     }
 
+    setIsUploading(true);
+    setUploadProgress(0);
+
     const formData = new FormData();
     formData.append('video', file);
     formData.append('title', title);
@@ -86,13 +93,55 @@ export default function UploadPage() {
         setFile(null);
         setTitle('');
         setDescription('');
+        setIsUploading(false);
         toast.success('Video uploaded! Processing started...');
       },
+      onError: () => {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }
     });
   };
 
   if (!isAuthenticated) {
     return null;
+  }
+
+  if (isUploading) {
+    return (
+      <div className="min-h-screen bg-gray-950 py-8">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold mb-8">Uploading Video</h1>
+
+          <div className="bg-gray-900 rounded-lg p-8">
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-2">{title}</h2>
+              <p className="text-gray-400">Uploading to server...</p>
+            </div>
+
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-semibold text-red-500">
+                  {uploadProgress < 100 ? '🚀 Uploading...' : '⚙️ Finalizing...'}
+                </span>
+                <span className="text-sm text-gray-400">{uploadProgress}%</span>
+              </div>
+
+              <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-red-500 h-3 rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+
+            <p className="text-center text-gray-400 text-sm">
+              Please do not close this tab until the upload is complete.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (jobId && statusQuery.data) {
@@ -190,8 +239,8 @@ export default function UploadPage() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-lg p-12 text-center transition ${isDragging
-                  ? 'border-red-500 bg-red-500/10'
-                  : 'border-gray-700 hover:border-gray-600'
+                ? 'border-red-500 bg-red-500/10'
+                : 'border-gray-700 hover:border-gray-600'
                 }`}
             >
               {file ? (
