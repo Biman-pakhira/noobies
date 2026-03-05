@@ -64,16 +64,22 @@ export async function getVideoMetadata(filePath: string): Promise<{
  * Transcode video to HLS segments
  */
 export async function transcodeToHLS(options: TranscodeOptions): Promise<TranscodeResult[]> {
-  const { inputPath, outputDir, resolutions } = options;
+  const { inputPath, outputDir, resolutions, onProgress } = options;
 
   // Ensure output directory exists
   await fs.mkdir(outputDir, { recursive: true });
 
   const results: TranscodeResult[] = [];
+  const total = resolutions.length;
 
-  for (const resolution of resolutions) {
+  for (let i = 0; i < total; i++) {
+    const resolution = resolutions[i];
     const result = await transcodeResolution(inputPath, outputDir, resolution);
     results.push(result);
+    // Report progress after each resolution: evenly spaced from 0–100
+    if (onProgress) {
+      await onProgress(Math.round(((i + 1) / total) * 100));
+    }
   }
 
   return results;

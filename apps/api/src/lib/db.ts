@@ -1,22 +1,25 @@
-// Try to load the compiled DB package client first (preferred)
-let client: any
+import { PrismaClient } from '@prisma/client';
 
-try {
-  // Use the built client in the workspace packages (absolute path)
-  const mod = await import('/Users/macbookair/noobies/packages/db/dist/client.js')
-  client = mod.default ?? mod.db ?? mod
-} catch (e) {
-  // Fallback: instantiate a local PrismaClient from @prisma/client
-  const { PrismaClient } = await import('@prisma/client')
-
-  declare global {
-    // eslint-disable-next-line vars-on-top, no-var
-    var __prismaClient: PrismaClient | undefined
-  }
-
-  client = global.__prismaClient || new PrismaClient()
-
-  if (process.env.NODE_ENV !== 'production') global.__prismaClient = client
+// Declare global cache to avoid multiple instances in dev hot-reload
+declare global {
+  // eslint-disable-next-line no-var, vars-on-top
+  var __prismaClient: PrismaClient | undefined;
 }
 
-export default client
+let client: PrismaClient;
+
+if (global.__prismaClient) {
+  client = global.__prismaClient;
+} else {
+  client = new PrismaClient({
+    log: process.env.NODE_ENV === 'development'
+      ? ['warn', 'error']
+      : ['error'],
+  });
+
+  if (process.env.NODE_ENV !== 'production') {
+    global.__prismaClient = client;
+  }
+}
+
+export default client;

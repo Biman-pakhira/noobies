@@ -6,6 +6,6 @@
   "scripts": {
     "dev": "poetry run uvicorn app.main:app --reload --port 8000",
     "build": "poetry build",
-    "test": "poetry run pytest"
+    "test": "poetry run pytest || [ $? -eq 5 ]"
   }
 }

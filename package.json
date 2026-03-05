@@ -1,6 +1,7 @@
 {
   "name": "video-streaming-platform",
   "version": "1.0.0",
+  "packageManager": "npm@11.8.0",
   "description": "Full-stack video streaming and discovery platform with AI recommendations",
   "private": true,
   "workspaces": [
@@ -9,7 +10,7 @@
   ],
   "scripts": {
     "dev": "turbo run dev --parallel",
-    "build": "turbo run build --filter=!@video-platform/recommender", 
+    "build": "turbo run build --filter=!@video-platform/recommender",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "turbo run format",
@@ -18,12 +19,12 @@
   },
   "devDependencies": {
     "@types/fluent-ffmpeg": "^2.1.28",
-    "prisma": "^7.4.2",
-    "turbo": "^1.10.12",
+    "prisma": "^5.22.0",
+    "turbo": "^2.0.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@prisma/client": "^7.4.2",
+    "@prisma/client": "^5.22.0",
     "mongodb": "^7.1.0"
   }
 }

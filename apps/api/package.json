@@ -30,7 +30,6 @@
     "@fastify/helmet": "^11.1.1",
     "@fastify/jwt": "^7.2.4",
     "@fastify/multipart": "^8.0.0",
-    "@prisma/client": "^5.22.0",
     "@video-platform/db": "*",
     "@video-platform/types": "*",
     "aws-sdk": "^2.1500.0",

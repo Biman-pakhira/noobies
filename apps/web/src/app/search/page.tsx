@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useGetQuery } from '@/hooks/useApi';
@@ -37,20 +37,28 @@ interface SearchResponse {
   hasMore: boolean;
 }
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState<SearchFilters>({
-    q: searchParams.get('q') || '',
-    sort: searchParams.get('sort') || 'relevance',
-    category: searchParams.get('category') || '',
-    dateRange: searchParams.get('dateRange') || '',
+    q: searchParams?.get('q') || '',
+    sort: searchParams?.get('sort') || 'relevance',
+    category: searchParams?.get('category') || '',
+    dateRange: searchParams?.get('dateRange') || '',
   });
   const [page, setPage] = useState(1);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Update filters when searchParams change (from router.push)
+  useEffect(() => {
+    const q = searchParams?.get('q') || '';
+    if (q !== filters.q) {
+      setFilters(prev => ({ ...prev, q }));
+    }
+  }, [searchParams]);
 
   // Fetch search results
   useEffect(() => {
@@ -354,5 +362,17 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-gray-700 border-t-red-500 rounded-full"></div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   );
 }

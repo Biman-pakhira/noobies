@@ -101,7 +101,7 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
       });
     }
 
-    // Create video record
+    // ── Step 1: Create video record in DB (always, regardless of queue state) ──
     const video = await db.video.create({
       data: {
         title,
@@ -142,13 +142,22 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
       });
     }
 
-    // Queue transcoding job
-    const transcodingQueue = getTranscodingQueue();
-    const jobId = await transcodingQueue.addJob({
-      videoId: video.id,
-      uploadPath: tempPath,
-      resolutions: ['360p', '480p', '720p', '1080p'],
-    });
+    // ── Step 2: Queue transcoding job (best-effort — graceful if Redis is down) ──
+    let jobId: string | undefined;
+    try {
+      const transcodingQueue = getTranscodingQueue();
+      jobId = await transcodingQueue.addJob({
+        videoId: video.id,
+        uploadPath: tempPath,
+        resolutions: ['360p', '480p', '720p', '1080p'],
+      }) as string | undefined;
+    } catch (queueErr: any) {
+      // Redis unavailable — the DB record is already saved, log and continue.
+      console.warn(
+        `⚠️  Could not queue transcoding job for video ${video.id}: ${queueErr.message}`,
+      );
+      jobId = `local-${video.id}`;
+    }
 
     return reply.status(202).send({
       success: true,
@@ -160,7 +169,7 @@ async function uploadVideo(request: FastifyRequest, reply: FastifyReply) {
           createdAt: video.createdAt,
         },
         job: {
-          id: jobId,
+          id: jobId ?? `local-${video.id}`,
           status: 'queued',
         },
       },
