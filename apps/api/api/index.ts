@@ -1,4 +1,4 @@
-import { createApp } from '../apps/api/src/index.js';
+import { createApp } from '../src/index.js';
 import { FastifyInstance } from 'fastify';
 
 let app: FastifyInstance;
